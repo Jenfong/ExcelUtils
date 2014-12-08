@@ -3,9 +3,11 @@ package jenfong.hnacode.deal;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +31,40 @@ public class Excelsplit {
 
 	private static Log log = LogFactory.getLog(Excelsplit.class);
 	private static String templateFileName = "D://edata/dealfiles/dailyReportTemplate_dev2.xls";
-	// private static String templateFileName =
-	// "D://edata/dealfiles/dailyReportTemplate.xls";
-	private static String destFileName = "D://edata/dealfiles/dest_test/康乐园2014-11-";
-	private static String destFileName1 = "D://edata/dealfiles/dest_test/康乐园2014-10-";
+	// private static String templateFileName = "D://edata/dealfiles/dailyReportTemplate.xls";
+	private static String startYear = "2014";
+	private static String startMonth = "11";
+	private final static String startDay = "25";
+	private static Date startDate = new Date();//当月财务结算截至日期
+	private static Date endDate = new Date();//当月财务结算开始日期
+	private final static SimpleDateFormat sdformat = new SimpleDateFormat("yyy-MM-dd");
+	private static String destFileName = "D://edata/dealfiles/dest_test/康乐园2014-12-";
+	private static String destFileName1 = "D://edata/dealfiles/dest_test/康乐园2014-11-";
+	private static String sourcefile = "E:/docments/hotel/BI项目/康乐园2014年3月—12月份营业日报/6/康乐园 2014年12月份营业日报.xls";
+	
+	static {
+		try {
+			String nameTemp = sourcefile.substring(sourcefile.lastIndexOf("/")+1);
+			startYear = nameTemp.substring(nameTemp.indexOf("年")-4,nameTemp.indexOf("年"));//年
+			startMonth = nameTemp.substring(nameTemp.indexOf("年")+1,nameTemp.indexOf("月"));//月
+			sdformat.parse("2014-"+startMonth+"-"+startDay);
+			Calendar cal =  sdformat.getCalendar();
+			startDate = cal.getTime();
+			cal.add(Calendar.MONTH, -1);
+			cal.add(Calendar.DATE, 1);
+			endDate = cal.getTime();
+			log.info(sdformat.format(startDate));
+			log.info(sdformat.format(endDate));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		destFileName += sdformat.format(startDate);
+	}
 
 	public static void main(String[] args) {
 		// String sourcefile = "D:/edata/Book1.xls";
-		String sourcefile = "D:/edata/康乐园2014-11-25.xls";
+//		String sourcefile = "D:/edata/康乐园2014-11-25.xls";
+		
 		try {
 			Workbook wb = createWb(sourcefile);
 			HashMap<String, Object> sheetMap = new HashMap<String, Object>();
